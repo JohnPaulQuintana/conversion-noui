@@ -1,8 +1,7 @@
 import requests
-from bs4 import BeautifulSoup
 import re
 import json
-import pandas as pd
+import csv
 
 LOGIN_URL = "https://bo.bonasapoint.com/Login"
 DEPOSIT_URL = "https://bo.bonasapoint.com/DepositPaymentSetting"
@@ -44,13 +43,16 @@ else:
         rows = data.get("data", [])
         print(f"✅ Extracted {len(rows)} rows")
 
-        # Convert to DataFrame
-        df = pd.DataFrame(rows)
-        print(df.head())
-
-        # Save to CSV
-        df.to_csv("deposit_payment_settings.csv", index=False, encoding="utf-8-sig")
-        print("📂 Saved to deposit_payment_settings.csv")
+        # Save to CSV using csv.DictWriter
+        if rows:
+            keys = rows[0].keys()
+            with open("deposit_payment_settings.csv", "w", newline="", encoding="utf-8-sig") as f:
+                writer = csv.DictWriter(f, fieldnames=keys)
+                writer.writeheader()
+                writer.writerows(rows)
+            print("📂 Saved to deposit_payment_settings.csv")
+        else:
+            print("⚠️ No rows found in data")
 
     except Exception as e:
         print("❌ Error parsing JSON:", e)
