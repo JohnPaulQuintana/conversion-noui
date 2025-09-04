@@ -1,0 +1,7 @@
+(env) C:\Users\BAJ-LAP-012\Desktop\conversion-noui>python bonasa.py
+C:\Users\BAJ-LAP-012\Desktop\conversion-noui\env\Lib\site-packages\urllib3\connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'bo.bonasapoint.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+Login status: 200
+Deposit page statuss: 200
+
+(env) C:\Users\BAJ-LAP-012\Desktop\conversion-noui>
