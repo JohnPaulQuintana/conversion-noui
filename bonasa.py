@@ -27,7 +27,7 @@ print("Login status:", resp.status_code)
 
 # Step 2: Go to DepositPaymentSetting
 deposit_page = session.get(DEPOSIT_URL, headers=headers)
-print("Deposit page status:", deposit_page.status_code)
+print("Deposit page statuss:", deposit_page.status_code)
 
 # Step 3: Parse with BeautifulSoup
 soup = BeautifulSoup(deposit_page.text, "html.parser")
