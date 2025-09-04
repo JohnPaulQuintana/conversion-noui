@@ -1,5 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
+import re
+import json
+import pandas as pd
 
 LOGIN_URL = "https://bo.bonasapoint.com/Login"
 DEPOSIT_URL = "https://bo.bonasapoint.com/DepositPaymentSetting"
@@ -28,21 +31,26 @@ print("Login status:", resp.status_code)
 deposit_page = session.get(DEPOSIT_URL, headers=headers, verify=False)
 print("Deposit page status:", deposit_page.status_code)
 
-# Step 3: Parse with BeautifulSoup
-soup = BeautifulSoup(deposit_page.text, "html.parser")
+html = deposit_page.text
 
-# Debug: save page to check
-with open("deposit_page.html", "w", encoding="utf-8") as f:
-    f.write(soup.prettify())
-
-# Step 4: Extract tables
-tables = soup.find_all("table")
-
-if not tables:
-    print("⚠️ No <table> found. Page might be loading data with JavaScript.")
+# Step 3: Extract SerializeModel JSON from <script>
+match = re.search(r"var\s+SerializeModel\s*=\s*(\{.*?\});", html, re.S)
+if not match:
+    print("⚠️ SerializeModel not found in page")
 else:
-    for idx, table in enumerate(tables):
-        print(f"\n--- Table {idx+1} ---")
-        for row in table.find_all("tr"):
-            cols = [c.get_text(strip=True) for c in row.find_all(["td", "th"])]
-            print(cols)
+    json_str = match.group(1)
+    try:
+        data = json.loads(json_str)
+        rows = data.get("data", [])
+        print(f"✅ Extracted {len(rows)} rows")
+
+        # Convert to DataFrame
+        df = pd.DataFrame(rows)
+        print(df.head())
+
+        # Save to CSV
+        df.to_csv("deposit_payment_settings.csv", index=False, encoding="utf-8-sig")
+        print("📂 Saved to deposit_payment_settings.csv")
+
+    except Exception as e:
+        print("❌ Error parsing JSON:", e)
