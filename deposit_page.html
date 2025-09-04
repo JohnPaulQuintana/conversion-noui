@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Bonasa Point System
+  </title>
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback" rel="stylesheet"/>
+  <script src="/bundles/jquery?v=235DeCRyc2KKtm5-u-WowaGmWHU3ft44y448NxHpMf41">
+  </script>
+  <script src="/bundles/bootstrap?v=oKrkuFhTY6Ttizyky0x7zfuIl-YQt5vKMhTrkyIQRlQ1">
+  </script>
+  <script src="/adminlte/js?v=kuG8UovDlWCbVSlz90tP-UFEiE_St-Fz0bZu5hMgVrk1">
+  </script>
+  <script src="/bundles/modernizr?v=inCVuEFe6J4Q07A0AcRsbJic_UE5MwpRMNGcOtk94TE1">
+  </script>
+  <link href="/Layout/plugins/jsgrid/jsgrid.min.css" rel="stylesheet">
+   <link href="/Layout/plugins/jsgrid/jsgrid-theme.min.css" rel="stylesheet"/>
+   <link href="/Content/daterangepicker.css" rel="stylesheet"/>
+   <link href="/Content/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+   <link href="/Layout/plugins/toastr/toastr.min.css" rel="stylesheet"/>
+   <link href="/Content/loading.css" rel="stylesheet"/>
+   <link href="/Content/css/select2.css" rel="stylesheet"/>
+   <script type="text/javascript">
+    var gJsDisplayDateFormat = 'MMM-DD-YYYY';
+        var gJsDisplayDateTimeFormat = 'MMM-DD-YYYY HH:mm';
+        var gJsDisplayDateTimeSecFormat = 'MMM-DD-yyyy HH:mm:ss';
+        var gBOTimeoutInterval = 60 * 60000;
+   </script>
+   <script src="/Scripts/jquery-ui-1.13.2.min.js">
+   </script>
+   <script src="/Scripts/moment.min.js">
+   </script>
+   <script src="/Scripts/moment-with-locales.min.js">
+   </script>
+   <script src="/Scripts/daterangepicker.js">
+   </script>
+   <script src="/Scripts/bootstrap-datetimepicker.min.js">
+   </script>
+   <script src="/Scripts/select2.min.js">
+   </script>
+   <script src="/Layout/plugins/toastr/toastr.min.js">
+   </script>
+   <script src="/Scripts/site.js">
+   </script>
+   <script src="/Scripts/validation.js">
+   </script>
+   <script src="/Layout/plugins/jsgrid/jsgrid.min.js">
+   </script>
+   <script src="/Scripts/colResizable-1.6.min.js">
+   </script>
+   <script src="/Scripts/jsgrid-extension.js">
+   </script>
+   <link href="/Content/globalcss?v=m9WzRdCOyFtZCZKnV3I1PFVmnWHiOgqW6wRpZWIghR41" rel="stylesheet"/>
+  </link>
+ </head>
+ <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+  <div id="loadingscreen">
+   <div class="loading_bg">
+   </div>
+   <div class="loadingDiv-parent">
+    <div class="loadingDiv">
+     <h3 class="panel-title noselect">
+     </h3>
+    </div>
+   </div>
+   <div class="loading-gif noselect">
+   </div>
+  </div>
+  <div aria-hidden="true" aria-labelledby="SessionTimeoutModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="SessionTimeoutModal" role="dialog" tabindex="-1">
+   <div class="modal-dialog" role="document">
+    <div class="modal-content">
+     <div class="modal-header">
+      <h5 class="modal-title">
+       Session Timeout
+      </h5>
+     </div>
+     <div class="modal-body">
+      <h6>
+       Your session will expired in
+       <span>
+        xx
+       </span>
+       seconds. Please click 'Continue' to stay logged in.
+      </h6>
+      <h6 class="d-none">
+       You have been logged out. Please log in again to continue using the system.
+      </h6>
+     </div>
+     <div class="modal-footer">
+      <button class="btn btn-primary gcontss" type="button">
+       Continue
+      </button>
+      <button class="btn btn-primary glogout d-none" type="button">
+       Log In Again
+      </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="wrapper">
+   <!-- Navbar -->
+   <nav class="main-header navbar navbar-expand navbar-dark navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+     <li class="nav-item">
+      <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+       <i class="fas fa-bars">
+       </i>
+      </a>
+     </li>
+    </ul>
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+     <!-- Navbar Search -->
+     <li class="nav-item">
+      <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+       <i class="fas fa-expand-arrows-alt">
+       </i>
+      </a>
+     </li>
+     <li class="nav-item">
+      <a class="nav-link" data-slide="true" data-theme="dark" data-widget="toggle-darktheme" href="#" role="button">
+       <i class="fas fa-adjust">
+       </i>
+      </a>
+     </li>
+     <li class="nav-item dropdown">
+      <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-bs-toggle="dropdown" href="#" id="languageDropdown" role="button" title="Switch Currency">
+       <i class="fa fa-globe me-2">
+       </i>
+       BDT
+      </a>
+      <div aria-labelledby="languageDropdown" class="dropdown-menu dropdown-menu-end">
+       <a class="dropdown-item active" href="#" onclick="gSetCurrency('BDT')">
+        BDT
+       </a>
+      </div>
+     </li>
+     <li class="nav-item">
+      <a class="nav-link" data-slide="true" data-widget="toggle-logout" href="#" role="button" title="Logout">
+       <i class="fas fa-sign-out-alt">
+       </i>
+      </a>
+     </li>
+    </ul>
+   </nav>
+   <!-- /.navbar -->
+   <!-- Main Sidebar Container -->
+   <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a class="brand-link" href="/">
+     <img alt="AdminLTE Logo" class="brand-image img-circle elevation-3" src="/Content/Login/images/Login.png" style="opacity: .8"/>
+     <span class="brand-text font-weight-light">
+      Bonasa Point
+     </span>
+    </a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+     <!-- Sidebar user panel (optional) -->
+     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="image">
+       <img alt="User Image" class="img-circle elevation-2" src="/Layout/img/user2-160x160.jpg"/>
+      </div>
+      <div class="info">
+       <a class="d-block" href="#">
+        Summer (BAJI)
+       </a>
+      </div>
+     </div>
+     <!-- SidebarSearch Form -->
+     <div class="form-inline">
+      <div class="input-group" data-widget="sidebar-search">
+       <input aria-label="Search" class="form-control form-control-sidebar" placeholder="Search" type="search"/>
+       <div class="input-group-append">
+        <button class="btn btn-sidebar">
+         <i class="fas fa-search fa-fw">
+         </i>
+        </button>
+       </div>
+      </div>
+     </div>
+     <!-- Sidebar Menu -->
+     <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview" role="menu">
+       <!-- Add icons to the links using the .nav-icon class
+                        with font-awesome or any other icon font library -->
+       <li class="nav-item menu-is-opening menu-open">
+        <a class="nav-link active" href="#">
+         <i class="nav-icon fas nav-icon fas fa-city">
+         </i>
+         <p>
+          Merchant
+          <i class="fas fa-angle-right right">
+          </i>
+         </p>
+        </a>
+        <ul class="nav nav-treeview">
+         <li class="nav-item">
+          <a class="nav-link" href="/MerchantData">
+           <i class="nav-icon fas far fa-folder">
+           </i>
+           <p>
+            Merchant Data
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/MerchantTransaction">
+           <i class="nav-icon fas fas fa-receipt">
+           </i>
+           <p>
+            Merchant Transaction
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/CreditAdjustment">
+           <i class="nav-icon fas fas fa-file-invoice">
+           </i>
+           <p>
+            Credit Adjustment
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link active" href="/DepositPaymentSetting">
+           <i class="nav-icon fas fas fa-cog">
+           </i>
+           <p>
+            Deposit Payment Setting
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/CreditSummary">
+           <i class="nav-icon fas far fa-file-lines">
+           </i>
+           <p>
+            Credits Summary
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/Withdrawal">
+           <i class="nav-icon fas fas fa-money-bill-transfer">
+           </i>
+           <p>
+            Withdrawal Transaction
+           </p>
+          </a>
+         </li>
+        </ul>
+       </li>
+       <li class="nav-item">
+        <a class="nav-link" href="#">
+         <i class="nav-icon fas fas fa-users-cog">
+         </i>
+         <p>
+          Agent
+          <i class="fas fa-angle-right right">
+          </i>
+         </p>
+        </a>
+        <ul class="nav nav-treeview">
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentAccount">
+           <i class="nav-icon fas fas fa-user-alt">
+           </i>
+           <p>
+            Agent Account
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentCreditDeposit">
+           <i class="nav-icon fas fas fa-coins">
+           </i>
+           <p>
+            Agent Deposit
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentCredit">
+           <i class="nav-icon fas fas fa-wallet">
+           </i>
+           <p>
+            Agent Credit
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentSMS">
+           <i class="nav-icon fas fas fa-sms">
+           </i>
+           <p>
+            Agent SMS
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentPostedCredit">
+           <i class="nav-icon fas fas fa-paper-plane">
+           </i>
+           <p>
+            Posted Credit Summary
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentCreditRelease">
+           <i class="nav-icon fas fas fa-money-bill-transfer">
+           </i>
+           <p>
+            Credit Release Request
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentWalletTransaction">
+           <i class="nav-icon fas fas fa-wallet">
+           </i>
+           <p>
+            Wallet Transaction
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentWalletSummary">
+           <i class="nav-icon fas fas fa-wallet">
+           </i>
+           <p>
+            Wallet Summary
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/CreditTransfer">
+           <i class="nav-icon fas fas fa-credit-card">
+           </i>
+           <p>
+            Credit Transfer
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentDetail">
+           <i class="nav-icon fas fas fa-users-cog">
+           </i>
+           <p>
+            Agent Detail
+           </p>
+          </a>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/AgentGroup">
+           <i class="nav-icon fas fas fa-user-group">
+           </i>
+           <p>
+            Agent Group
+           </p>
+          </a>
+         </li>
+        </ul>
+       </li>
+       <li class="nav-item">
+        <a class="nav-link" href="#">
+         <i class="nav-icon fas fas fa-th">
+         </i>
+         <p>
+          User
+          <i class="fas fa-angle-right right">
+          </i>
+         </p>
+        </a>
+        <ul class="nav nav-treeview">
+         <li class="nav-item">
+          <a class="nav-link" href="/UserAccount">
+           <i class="nav-icon fas fas fa-user-lock">
+           </i>
+           <p>
+            User Account
+           </p>
+          </a>
+         </li>
+        </ul>
+       </li>
+       <li class="nav-item">
+        <a class="nav-link" href="/SystemSetting">
+         <i class="nav-icon fas fas fa-cog">
+         </i>
+         <p>
+          System Setting
+         </p>
+        </a>
+       </li>
+      </ul>
+     </nav>
+     <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+   </aside>
+   <!-- Content Wrapper. Contains page content -->
+   <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+     <div class="container-fluid">
+      <div class="row mb-2">
+       <div class="col-sm-6">
+        <h1 class="m-0 text-dark">
+         Deposit Payment Setting
+        </h1>
+       </div>
+       <!-- /.col -->
+       <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+        </ol>
+       </div>
+       <!-- /.col -->
+      </div>
+      <!-- /.row -->
+     </div>
+     <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    <!-- Main content -->
+    <div class="content">
+     <div class="container-fluid">
+      <body>
+       <div aria-hidden="true" aria-labelledby="ConfirmationModal" class="modal fade" id="ConfirmationModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-xl" role="document">
+         <div class="modal-content">
+          <div class="modal-header">
+           <h5 class="modal-title" id="_ModalTitle">
+            Credit Rate Changes
+           </h5>
+           <button aria-label="Close" class="close" data-bs-dismiss="modal" type="button">
+            <span aria-hidden="true">
+             ×
+            </span>
+           </button>
+          </div>
+          <div class="modal-body" id="_ModalBody">
+           ...
+          </div>
+          <div class="modal-footer" style=" justify-content: center;">
+           <button class="btn btn-primary" data-dismiss="modal" id="btnProceedUpdate" type="button">
+            Proceed
+           </button>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="container-fluid">
+        <div class="card" id="DepositPaymentSettingfrm">
+         <div class="card-body col-sm-12 p-2" id="parentElement">
+          <div id="gdvDepositPaymentSetting">
+          </div>
+         </div>
+         <div class="card-body col-sm-12 p-2" id="chilElement" style="display:none">
+          <div id="DepositPaymentDetails">
+          </div>
+          <div class="form-group col-sm-12">
+           <div class="text-center">
+            <div class="hr10 visible-xs">
+            </div>
+            <button class="btn btn-primary" id="btnBack" type="button">
+             Back
+            </button>
+            <div class="hr10 visible-xs">
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </body>
+      <script type="text/javascript">
+       var SerializeModel = {"AllowAdd":false,"AllowEdit":false,"AllowDelete":false,"HasDetails":true,"ServerSideLoading":false,"Selection":false,"SingleSelection":false,"SelectedItems":null,"KeyFieldName":"SettingID","data":[{"SettingID":"S001","PaymentMethod":"BKASH","Currency":"BDT","ServiceProvider":"BANGKOKPAY","AccountName":"BKASH","AccountNumber":"1330291238","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"100000;150000;160000;170000;180000;190000;200000","Status":"true","DailyMaxAmt":0,"DepositMinAmt":100000},{"SettingID":"S002","PaymentMethod":"NAGAD","Currency":"BDT","ServiceProvider":"BANGKOKPAY","AccountName":"NAGAD","AccountNumber":"1330291235","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"10000;11000;12000;13000;14000;15000;16000;17000;18000;19000;20000;21000;22000;23000;24000;25000;12800;20580","Status":"true","DailyMaxAmt":0,"DepositMinAmt":10000},{"SettingID":"S003","PaymentMethod":"ROCKET","Currency":"BDT","ServiceProvider":"BANGKOKPAY","AccountName":"ROCKET","AccountNumber":"ROCKET","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"10000;11000;12000;13000;14000;15000;16000;17000;18000;19000;20000;21000;22000;23000;24000;25000;22420","Status":"true","DailyMaxAmt":0,"DepositMinAmt":10000},{"SettingID":"S004","PaymentMethod":"OKWALLET","Currency":"BDT","ServiceProvider":"BANGKOKPAY","AccountName":"OKWALLET","AccountNumber":"OKWALLET","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"","Status":"true","DailyMaxAmt":0,"DepositMinAmt":0},{"SettingID":"S005","PaymentMethod":"UPAY","Currency":"BDT","ServiceProvider":"BANGKOKPAY","AccountName":"UPAY","AccountNumber":"UPAY","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"10000;11000;12000;13000;14000;15000;16000;17000;18000;19000;20000;21000;22000;23000;24000;25000","Status":"true","DailyMaxAmt":0,"DepositMinAmt":10000},{"SettingID":"S006","PaymentMethod":"SURECASH","Currency":"BDT","ServiceProvider":"BANGKOKPAY","AccountName":"SURECASH","AccountNumber":"SURECASH","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"","Status":"true","DailyMaxAmt":0,"DepositMinAmt":0},{"SettingID":"S007","PaymentMethod":"LOCALBANK","Currency":"BDT","ServiceProvider":"LOCALBANK","AccountName":"LOCALBANK","AccountNumber":"LOCALBANK","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"50,000.00;60,000.00;70,000.00;80,000.00;30,000.00;40,000.00;20,000.00;75,000.00;25,000.00;130,000.00;100,000.00;110,000.00;95,000.00;45,000.00;35,000.00;85,000.00;65,000.00;55,000.00;10,000.00;90000;15,000.00;5,000.00;120,000.00;200,000.00","Status":"true","DailyMaxAmt":0,"DepositMinAmt":5000},{"SettingID":"S008","PaymentMethod":"USDT","Currency":"BDT","ServiceProvider":"IPAY","AccountName":"USDT","AccountNumber":"USDT","TimeStart":"00:00","TimeEnd":"23:59","AmountSetting":"","Status":"true","DailyMaxAmt":0,"DepositMinAmt":100}],"fields":[{"name":"SettingID","title":"SettingID","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":false,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"PaymentMethod","title":"Payment Method","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"Currency","title":"Currency","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"ServiceProvider","title":"Service Provider","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"AccountName","title":"Account Name","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"AccountNumber","title":"Account Number","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"TimeStart","title":"Time Start","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"TimeEnd","title":"Time End","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"Status","title":"Status","type":"select","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":[{"Name":"","Id":""},{"Name":"Active","Id":"true"},{"Name":"Inactive","Id":"false"}],"valueField":"Id","textField":"Name"},{"name":"AmountSetting","title":"Amount Setting","type":"text","width":"auto","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":true,"editButton":false,"items":null,"valueField":null,"textField":null},{"name":"DailyMaxAmt","title":"Daily Maximum Amount","type":"text","width":"140","validate":"required","editing":false,"filtering":true,"sorting":true,"visible":false,"editButton":false,"items":null,"valueField":null,"textField":null}],"InsertURL":{"urlAction":{"action":null,"controller":null,"area":null,"param":null},"URL":""},"UpdateURL":{"urlAction":{"action":null,"controller":null,"area":null,"param":null},"URL":""},"DeleteURL":{"urlAction":{"action":"DeleteMDepositPaymentSetting","controller":"DepositPaymentSetting","area":"","param":null},"URL":"/DepositPaymentSetting/DeleteMDepositPaymentSetting"},"ViewURL":{"urlAction":{"action":"ViewDepositPaymentSettingDetails","controller":"DepositPaymentSetting","area":"","param":null},"URL":"/DepositPaymentSetting/ViewDepositPaymentSettingDetails"},"LoadDataURL":{"urlAction":{"action":null,"controller":null,"area":null,"param":null},"URL":""},"ViewCallBack":{"Action":null,"Parentelem":"parentElement","childelem":"chilElement","childelemID":"DepositPaymentDetails","childGridID":null},"CustomButtons":[]};
+    var UpdateDepositPaymentSettingURL = '/DepositPaymentSetting/UpdateDepositPaymentSetting'
+    var LoadDepositPaymentSettingIndex = '/DepositPaymentSetting'
+    var CreditRateList = [];
+
+    var statusTemplate = function (value) {
+        var backgroundcolor = '#d84d4d'
+        if (value == 'false') {
+            value = 'Inactive'
+            backgroundcolor = '#9795a7'
+        } else if (value == 'true') {
+            value = 'Active'
+            backgroundcolor = '#337b2b'
+        }
+
+        var elem = $('<div>').attr({ style: 'background-color:' + backgroundcolor + ';border-radius: 5px;text-align: center;color: white;font-weight: bold;' }).text(value);
+        elem.append(elem)
+        return elem;
+    }
+
+    var customItemTemplate = {
+        Status: statusTemplate
+    }
+
+    var CustomPostCallback = function (data) {
+        //to handle if populate grid or normal form
+        InitDateRangePicker('.txt_daterange');
+        InitDatePicker('.txt_date');
+        InitNumeric('.txt_num');
+        InitNumericText('[contenteditable="true"]');
+    }
+
+    // data: SerializeModel, customItemTemplate: customItemTemplate
+    $('#gdvDepositPaymentSetting').IniJsGrid({ data: SerializeModel, customItemTemplate: customItemTemplate });
+
+    $('#btnBack').click(function (s, e) {
+        window.location = LoadDepositPaymentSettingIndex;
+    })
+
+    function detectCreditRateChanges() {
+        CreditRateList = [];
+        var gotchanges = false;
+
+        var tablecolumns = ["Action", "From", "From Changes", "To", "To Changes", "Deposit Rate (%)", "Deposit Rate (%) Changes", "Withdrawal Rate (%)", "Withdrawal Rate (%) Changes"];
+        var tableElem = $('<table>').attr('class', 'table table-hover')
+        tableElem.attr('style', 'text-align: center;font-size:1rem')
+        var thead = $('<thead>').attr('style', 'background-color: #343a40; color:white');
+        var td = $('<td>');
+        var tr = $('<tr>');
+        var tbody = $('<tbody>');
+        $.each(tablecolumns, function (i, v) {
+            td = $('<td>');
+            td.text(v);
+            tr.append(td);
+        })
+
+        thead.append(tr);
+        tableElem.append(thead);
+
+        $.each($('#chilElement').find('#creditratetbl').find('tbody tr'), function (i, v) {
+            var creditRate = {};
+            var creditID = $(v).data('id');
+            var tablecolumnBody = ["from", "to", "drate", "wrate"];
+
+            var trbody = $('<tr>')
+            var tdbody = $('<td>')
+
+            tdbody = $('<td>')
+            tdbody.text('')
+            creditRate.ID = creditID;
+            creditRate.Action = 'None';
+
+            if ($(v).data('new') == 'y') {
+                trbody.attr('style', 'background-color:#ffffe3');
+                tdbody.text('New');
+                creditRate.Action = 'New';
+                gotchanges = true;
+            }
+
+            if ($(v).data('delete') == 'y') {
+                trbody.attr('style', 'background-color:#e7abab');
+                tdbody.text('Remove')
+                creditRate.Action = 'Remove';
+                gotchanges = true;
+                if (creditID == undefined) {
+                    gotchanges = false;
+                }
+            }
+
+            trbody.append(tdbody);
+
+            $.each(tablecolumnBody, function (ii, col) {
+
+                var OriValue = $(v).find('[data-' + col + ']').data('value');
+                var ChangesValue = $(v).find('[data-' + col + ']').text()
+                OriValue = (OriValue == undefined ? ChangesValue : OriValue);
+                ChangesValue = ($(v).data('delete') == 'y' ? OriValue : ChangesValue);
+                tdbody = $('<td>')
+                tdbody.text(OriValue);
+                trbody.append(tdbody);
+
+                var bgColor = '';
+                creditRate[col] = ChangesValue;
+                if (OriValue != ChangesValue) {
+                    bgColor = '#b3e5b3';
+                    creditRate.Action = 'Edit';
+                    gotchanges = true;
+
+                } else {
+                    ChangesValue = '';
+                }
+
+                tdbody = $('<td>').attr('style', 'background-color:' + bgColor);
+                tdbody.text(ChangesValue);
+                trbody.append(tdbody);
+                tbody.append(trbody);
+            })
+
+            if (creditRate.Action != undefined) {
+                CreditRateList.push(creditRate);
+            }
+
+        })
+
+        tableElem.append(tbody);
+        $('#ConfirmationModal').find('#_ModalBody').html(tableElem);
+
+        return gotchanges;
+    }
+
+    $('#chilElement').on('click', '#btnUpdateDetails', function (s, e) {
+
+        if (detectCreditRateChanges()) {
+            $('#ConfirmationModal').modal('show');
+            return;
+        }
+
+        UpdateDetails()
+    });
+
+    $('#btnProceedUpdate').click(function (e) {
+        UpdateDetails()
+    });
+
+    function UpdateDetails() {
+        var elem = $('#btnUpdateDetails')
+        var _data = collectData()
+        var ajxNew = new _func.ajxNew();
+
+        ajxNew.url = UpdateDepositPaymentSettingURL;
+        ajxNew.data = _data;
+        ajxNew.processData = false;
+        ajxNew.contentType = false;
+
+        if (Validate('#DepositPaymentSettingfrm') && validateCheck()) {
+            showLoading();
+            _func.ajxCall(ajxNew, function (returndata) {
+                var dataresult = returndata.returnVal;
+                data = dataresult.m;
+                if (returndata) {
+                    hideLoading();
+
+                    if (data.status == '200') {
+
+                        if (dataresult.ErrorMsg == '') {
+
+                            if (elem.text() == 'Add') {
+                                showMessage('Add Successfully!', true);
+                                elem.text("Update");
+
+                            } else {
+                                showMessage('Update Successfully!', true);
+                            }
+                            $('#ConfirmationModal').modal('hide');
+                            ReloadCreditRateTable(dataresult.CreditRateTable);
+                        } else {
+                            showMessage(dataresult.ErrorMsg, false);
+                        }
+
+                    } else {
+                        showMessage(data.errorMessage, false);
+                    }
+
+                };
+            });
+        }
+
+    }
+
+    function ReloadCreditRateTable(creditratetbl) {
+        if (creditratetbl != '') {
+            $('#chilElement').find('#creditrateWrapper').html(creditratetbl);
+        }
+    }
+
+    function clearAlltableChangesValue() {
+        var tablecolumnBody = ["from", "to", "drate", "wrate"];
+        $.each($('#chilElement').find('#creditratetbl').find('tbody tr'), function (i, v) {
+            $(v).data('new', '');
+            $(v).data('delete', '');
+
+            $.each(tablecolumnBody, function (ii, col) {
+                var ChangesValue = $(v).find('[data-' + col + ']').text()
+                $(v).find('[data-' + col + ']').data('value', ChangesValue);
+
+            })
+        })
+    }
+
+    function validateCheck() {
+        var date1 = new Date('Jan 01, 2022 ' + $('#chilElement').find('#TimeStart').val());
+        var date2 = new Date('Jan 01, 2022 ' + $('#chilElement').find('#TimeEnd').val());
+
+        if (date1.getTime() > date2.getTime()) {
+            //date 1 is newer
+            showMessage('Time Start cannot later than Time End', false);
+           // alert('Time Start cannot later than Time End')
+            return false;
+        }
+
+        return true;
+    }
+
+    function collectData() {
+        var fd = new FormData();
+        fd.append('SettingID', $('#chilElement').find('#SettingID').val())
+        fd.append('PaymentMethod', $('#chilElement').find('#PaymentMethod').val())
+        fd.append('Currency', $('#chilElement').find('#Currency').val())
+        fd.append('ServiceProvider', $('#chilElement').find('#ServiceProvider').val())
+        fd.append('AccountName', $('#chilElement').find('#AccountName').val())
+        fd.append('AccountNumber', $('#chilElement').find('#AccountNumber').val())
+        fd.append('TimeStart', $('#chilElement').find('#TimeStart').val())
+        fd.append('TimeEnd', $('#chilElement').find('#TimeEnd').val())
+        fd.append('DepositMinAmt', $('#chilElement').find('#DepositMinAmt').val())
+        var amountsetting = [];
+        $.each($('.amountSetting'), function (i, v) {
+            amountsetting.push($(v).text())
+
+        })
+
+        fd.append('AmountSetting', amountsetting.join(";"));
+        fd.append('Status', ($('#chilElement').find('#Status').is(":checked") ? 1 : 0))
+        fd.append('ConversionRate', $('#chilElement').find('#ConversionRate').val())
+
+        $.each(CreditRateList, function (i, v) {
+            fd.append('CreditRateList[' + i + '].ID', v.ID);
+            fd.append('CreditRateList[' + i + '].Action', v.Action);
+            fd.append('CreditRateList[' + i + '].FromAmount', v.from);
+            fd.append('CreditRateList[' + i + '].ToAmount', v.to);
+            fd.append('CreditRateList[' + i + '].Rate', v.drate);
+            fd.append('CreditRateList[' + i + '].WithdrawalRate', v.wrate);
+        })
+
+        return fd;
+    }
+
+    $('#chilElement').on('keypress', '#AmountSettings', function ( e) {
+        if (e.which == 13) {
+            var elem = '<div class="amountSetting">' + $('#AmountSettings').val() + '<i class="fas fa-times" data-deleteamount="" style="margin-left:5px;color:red;cursor:pointer"></i></div>'
+            var duplicate = false;
+            $.each($('.amountSetting'), function (i, v) {
+                if ($(v).text() == $('#AmountSettings').val()) {
+                    showMessage('[' + $('#AmountSettings').val() + ']' + ' already in amount setting, please key in another amount.', false);
+                    duplicate = true;
+                }
+            })
+
+            if (!duplicate) {
+                $('#chilElement').find('.amountSettingWrapper').append(elem);
+                $('#AmountSettings').val('');
+            }
+        }
+    })
+
+    $('#chilElement').on('click', '[data-deleteamount]', function (e) {
+        $(this).closest('.amountSetting').remove();
+    })
+
+    $('#chilElement').on('click', '#btnAddCreditRate', function (e) {
+        var tr = $('<tr>').attr('style', 'background-color:#ffffe3');
+        tr.data('new','y');
+        var td = '<td><input class="tableDeleteIcon" /></td>' +
+            '<td><span data-from contenteditable="true" style="padding: 10px 5px 10px 5px;"></span></td>' +
+            '<td><span data-to contenteditable="true" style="padding: 10px 5px 10px 5px;"></span></td>' +
+            '<td><span data-drate contenteditable="true" style="padding: 10px 5px 10px 5px;"></span></td>' +
+            '<td><span data-wrate contenteditable="true" style="padding: 10px 5px 10px 5px;"></span></td>'
+        tr.append(td);
+        $('#creditratetbl').find('tbody').append(tr);
+        InitNumericText('[contenteditable="true"]');
+    })
+
+    $('#chilElement').on('click', '.tableDeleteIcon', function (e) {
+        var elem = $(this).closest('tr');
+        if (elem.data('id') == undefined) {
+            elem.remove();
+        } else {
+            elem.data('delete', 'y').hide();
+        }
+
+    })
+      </script>
+      <!-- /.row -->
+     </div>
+     <!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+   </div>
+   <!-- /.content-wrapper -->
+   <!-- Control Sidebar -->
+   <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+    <div class="p-3">
+     <h5>
+      Title
+     </h5>
+     <p>
+      Sidebar content
+     </p>
+    </div>
+   </aside>
+   <!-- /.control-sidebar -->
+   <!-- Main Footer -->
+   <footer class="main-footer">
+    <!-- To the right -->
+    <div class="float-right d-inline small">
+     Page refreshed on
+     <span id="gclientdt">
+     </span>
+    </div>
+    <!-- Default to the left -->
+    <strong>
+     Copyright © 2022.
+    </strong>
+    All rights reserved.
+   </footer>
+  </div>
+  <!-- ./wrapper -->
+ </body>
+</html>
+<script type="text/javascript">
+ function gSetCurrency(lang) {
+        if (lang === 'BDT') return; // Skip if same
+        var ajxNew = new _func.ajxNew()
+        ajxNew.url = '/Home/SetCurrency'
+        ajxNew.data = { Currency: lang };
+        ajxNew.displayLoading = false
+
+        _func.ajxCall(ajxNew, function (returndata) {
+            var data = returndata.returnVal;
+            if (data == 'success') {
+                location.reload();
+            } else {
+                showMessage(data, false);
+            };
+        });
+    }
+
+    $(document).on('click', '[data-widget="toggle-logout"], #SessionTimeoutModal .btn', function (e) {
+        if ($(this).hasClass('gcontss')) {
+            var ajxNew = new _func.ajxNew()
+            ajxNew.url = '/Login/KeepAlive'
+            ajxNew.displayLoading = false
+            _func.ajxCall(ajxNew, function () {
+                $('#SessionTimeoutModal').modal('hide')
+            })
+
+        } else {
+            document.location = '/Login/SignOut'
+        }
+    })
+</script>
