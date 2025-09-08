@@ -26,24 +26,27 @@ def read_and_calculate_bonasa_sheet_tab(logger: Logger, localtime) -> Dict[str, 
 
         # Skip header (row 1), read row 2+
         for row in rows[1:]:
-            if len(row) >= 2:
-                key, value = row[0].strip(), row[1].strip()
-                if key and value:
+            if len(row) >= 3:
+                date_str, currency, purchase_rate = row[0].strip(), row[1].strip(), row[2].strip()
+
+                if date_str and currency and purchase_rate:
                     try:
-                        original = float(value)
+                        original = float(purchase_rate)
                         effective = round(original * 1.01, 2)
                         results.append(
                             {
-                                "Date": key,
-                                "BDT Purchase Rate": original,
+                                "Date": date_str,
+                                "Currency": currency,
+                                "Purchase Rate": original,
                                 "Effective Conversion Rate": effective,
                             }
                         )
                     except ValueError:
                         results.append(
                             {
-                                "Date": key,
-                                "BDT Purchase Rate": value,
+                                "Date": date_str,
+                                "Currency": currency,
+                                "Purchase Rate": purchase_rate,
                                 "Effective Conversion Rate": None,
                             }
                         )
@@ -54,6 +57,7 @@ def read_and_calculate_bonasa_sheet_tab(logger: Logger, localtime) -> Dict[str, 
         logger.error(f"❌ Error reading sheet: {e}")
         return []
 
+
 def save_effective_conversion(logger: Logger, results: List[Dict[str, Any]]) -> None:
     try:
         logger.info("→ Opening automation worksheet...")
@@ -62,14 +66,22 @@ def save_effective_conversion(logger: Logger, results: List[Dict[str, Any]]) -> 
         try:
             worksheet = sh.worksheet("EFFECTIVE CONVERSION RATE")
         except Exception:
-            worksheet = sh.add_worksheet(title="BONASA_AUTOMATION", rows="1000", cols="2")
+            worksheet = sh.add_worksheet(title="BONASA_AUTOMATION", rows="1000", cols="4")
             worksheet.append_row(["Automation Date", "Effective Conversion Rate"])
 
         logger.success("→ Automation worksheet ready")
 
         # Prepare new rows
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_rows = [[now, row["Effective Conversion Rate"]] for row in results]
+        # now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.now()
+        # Get full timestamp
+        # full_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Separate date and time
+        date_part = now.strftime("%d/%m/%Y")
+        time_part = now.strftime("%H:%M:%S")
+
+        new_rows = [[date_part,time_part, row["Currency"], row["Effective Conversion Rate"]] for row in results]
 
         # Append rows (no overwrite)
         worksheet.append_rows(new_rows, value_input_option="USER_ENTERED")
