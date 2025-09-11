@@ -23,7 +23,7 @@ class BinanceP2PService:
             "filterType": "all",
             "periods": [],
             "additionalKycVerifyFilter": 0,
-            "publisherType": "merchant",
+            "publisherType": "",
             "payTypes": [],
             "classifies": ["mass", "profession", "fiat_trade"],
             "tradedWith": False,
@@ -32,7 +32,7 @@ class BinanceP2PService:
 
     def fetch_top5_completed_order_rates(self, fiat: str) -> dict:
         all_ads = []
-
+ 
         try:
             for page in range(1, 4):  # first 3 pages
                 payload = self._build_payload(fiat, page)
@@ -43,6 +43,12 @@ class BinanceP2PService:
                 for entry in data:
                     adv = entry.get("adv", {})
                     advertiser = entry.get("advertiser", {})
+                    trade_methods = entry.get("tradeMethods", [])
+                    trade_method_names = [method.get("tradeMethodName") for method in trade_methods]
+
+                    # Skip if Bank Transfer is one of the trade methods
+                    if "Bank Transfer" in trade_method_names:
+                        continue
 
                     all_ads.append({
                         "price": float(adv.get("price")),
@@ -55,6 +61,7 @@ class BinanceP2PService:
                         "nick": advertiser.get("nickName"),
                         "completionRate": advertiser.get("monthFinishRate"),
                         "orders": advertiser.get("monthOrderCount", 0),
+                        "tradeMethods": trade_method_names,
                     })
 
             # Sort by highest orders
@@ -76,3 +83,4 @@ class BinanceP2PService:
 
         except Exception:
             return {"status": "error", "message": traceback.format_exc()}
+

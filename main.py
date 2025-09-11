@@ -1,7 +1,7 @@
 import asyncio
 import random
 from datetime import datetime
-from services.binance_service import get_btc_eth_prices
+from services.binance_service import get_btc_eth_prices, get_usdt_to_usd
 from services.bonasa_service import BonasaService
 from services.xe_service import fetch_xe_rates
 from services.converter_service import convert_crypto_prices
@@ -33,6 +33,9 @@ async def retry_async(func, *args, retries=5, min_wait=1, max_wait=5, logger=Non
 async def main():
     logger = Logger()
 
+    #get usdt to usd price
+    binance_usdtusd = await retry_async(get_usdt_to_usd, retries=5, min_wait=2, max_wait=5, logger=logger)
+    
     # Task 1: Binance (BTC/ETH) with retries
     binance_data = await retry_async(get_btc_eth_prices, retries=5, min_wait=2, max_wait=5, logger=logger)
     if binance_data.get("status") != "success":
@@ -65,19 +68,19 @@ async def main():
 
     localtime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    scrapper_response = service.scrappe_bo(logger, converted.items(), binance_data.get("data", {}), p2p_service, localtime)
+    scrapper_response = service.scrappe_bo(logger, binance_usdtusd, xe_data.get("data", {}), converted.items(), binance_data.get("data", {}), p2p_service, localtime)
     logger.info(f"→ isCompleted: {scrapper_response}")
     if scrapper_response:
         logger.success(f"→ {scrapper_response}")
 
-        # BONASA AUTOMATION
-        bonasa_service = BonasaService()
-        auth_status = bonasa_service.authenticate(logger)
-        if auth_status:
-            rows = read_and_calculate_bonasa_sheet_tab(logger, datetime.now())
-            save_effective_conversion(logger, rows)
-        else:
-            logger.error("→ Something wen't wrong on bonasa automation.")
+        # # BONASA AUTOMATION
+        # bonasa_service = BonasaService()
+        # auth_status = bonasa_service.authenticate(logger)
+        # if auth_status:
+        #     rows = read_and_calculate_bonasa_sheet_tab(logger, datetime.now())
+        #     save_effective_conversion(logger, rows)
+        # else:
+        #     logger.error("→ Something wen't wrong on bonasa automation.")
     else:
         logger.error("→ Authentication failed.")
 

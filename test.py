@@ -1,11 +1,15 @@
 import httpx
 import certifi
-from utils.env_loader import get_env
+import asyncio
 import logging
-
-BINANCE_URL = get_env("BINANCE_URL_US", "https://api.binance.com/api/v3/ticker/price")
+from utils.env_loader import get_env
+# global
+# BINANCE_URL = get_env("BINANCE_URL_GLOBAL", "https://api.binance.com/api/v3/ticker/price")
+# US
+BINANCE_URL = get_env("BINANCE_URL_US", "https://api.binance.us/api/v3/ticker/price")
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 async def fetch_binance_price(symbol: str) -> dict:
@@ -48,32 +52,32 @@ async def get_btc_eth_prices() -> dict:
     """
     btc = await fetch_binance_price("BTCUSDT")
     eth = await fetch_binance_price("ETHUSDT")
-    # usdt = await fetch_binance_price("USDTUSD")
-    
+    usdt_usd = await fetch_binance_price("USDTUSD")  # proxy for USDT/USD
 
     errors = []
     if btc.get("status") != "success":
         errors.append(f"BTC: {btc.get('error')}")
     if eth.get("status") != "success":
         errors.append(f"ETH: {eth.get('error')}")
-    # if usdt.get("status") != "success":
-    #     errors.append(f"USDT: {usdt.get('error')}")
+    if usdt_usd.get("status") != "success":
+        errors.append(f"ETH: {eth.get('error')}")
 
     if errors:
-        return {"status": "error", "data": {"BTC": btc, "ETH": eth}, "error": "; ".join(errors)}
+        return {
+            "status": "error",
+            "data": {"BTC": btc, "ETH": eth, "USDT_USD": usdt_usd},
+            "error": "; ".join(errors),
+        }
 
-    return {"status": "success", "data": {"BTC": btc["data"], "ETH": eth["data"]}, "error": None}
+    return {"status": "success", "data": {"BTC": btc["data"], "ETH": eth["data"], "USDT": usdt_usd["data"]}, "error": None}
 
-async def get_usdt_to_usd() -> dict:
-    """
-    Fetch USDT to USD from Binance and return a unified status.
-    """
-    usdt = await fetch_binance_price("USDTUSD")
-    errors = []
-    if usdt.get("status") != "success":
-        errors.append(f"BTC: {usdt.get('error')}")
 
-    if errors:
-        return {"status": "error", "data": {"USDT": usdt}, "error": "; ".join(errors)}
+# ----------------------
+# Entry point
+# ----------------------
+if __name__ == "__main__":
+    async def main():
+        result = await get_btc_eth_prices()
+        print(result)
 
-    return {"status": "success", "data": {"USDT": usdt["data"]}, "error": None}
+    asyncio.run(main())

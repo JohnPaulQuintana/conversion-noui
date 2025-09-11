@@ -50,6 +50,8 @@ class BOScrapperService:
     def scrappe_bo(
         self,
         logger,
+        binance_usdtusd,
+        xe_data,
         converted_currency_value,
         current_usd_value,
         p2p_service,
@@ -126,7 +128,7 @@ class BOScrapperService:
 
                 # 7) Save CSV diff
                 calculate_diff_and_save(
-                    current_usd_value, bo_brand, crypto_data, converted_currency_value, logger, p2p_service, localtime
+                    binance_usdtusd, xe_data, current_usd_value, bo_brand, crypto_data, converted_currency_value, logger, p2p_service, localtime
                 )
                 logger.success(f"→ Differences saved")
 

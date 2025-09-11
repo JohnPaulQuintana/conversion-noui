@@ -24,6 +24,8 @@ def get_or_create_tab(sh, tab_name, fieldnames):
 
 
 def calculate_diff_and_save(
+    binance_usdtusd: Any,
+    xe_data: Any,
     current_usd_value: Dict[str, Any],
     bo_brand: str,
     crypto_data: Dict[str, Any],
@@ -43,7 +45,7 @@ def calculate_diff_and_save(
 
     diff_results_local = []
     diff_results_usdt = []
-
+    print(f"USDT/USD price: {binance_usdtusd}")
     for crypto, bo_list in crypto_data.items():
         crypto_upper = crypto.strip().upper()
 
@@ -53,6 +55,7 @@ def calculate_diff_and_save(
             for bo_entry in bo_list:
                 reused_currency = bo_entry["currency"].strip().upper()
                 reused_bo_value = bo_entry["marketPrice"]
+                xe_rate = xe_data.get("rates", {}).get(reused_currency, 1)
                 p2p_usdt_result = p2p_service.fetch_top5_completed_order_rates(
                     reused_currency
                 )
@@ -64,27 +67,29 @@ def calculate_diff_and_save(
                     / reused_bo_value
                 ) * 100
 
-                # top_ads = p2p_usdt_result.get("top_ads", [])
+                top_ads = p2p_usdt_result.get("top_ads", [])
                 row_usdt = {
                     "Date": localtime,
                     "Brand": bo_brand,
                     "Crypto": crypto_upper,
                     "Currency": reused_currency,
+                    "USD": float(binance_usdtusd.get("data", {}).get("USDT", {}).get("price", 1.0)),
+                    "XE RATE": round(xe_rate, 2) if xe_rate else None,
                     "BO Market Price": reused_bo_value,
                     "Binance Rate": round(p2p_usdt_result.get("binance_rate", 0), 2),
                     "Exchange Rate": round(exchange_rate, 2),
                     "Exchange Rate Sign": "Positive" if exchange_rate >= 0 else "Negative",
                 }
 
-                # for i in range(5):
-                #     if i < len(top_ads):
-                #         row_usdt[f"Top{i+1}_Nick"] = top_ads[i].get("nick", "")
-                #         row_usdt[f"Top{i+1}_Orders"] = top_ads[i].get("orders", "")
-                #         row_usdt[f"Top{i+1}_Price"] = top_ads[i].get("price", "")
-                #     else:
-                #         row_usdt[f"Top{i+1}_Nick"] = ""
-                #         row_usdt[f"Top{i+1}_Orders"] = ""
-                #         row_usdt[f"Top{i+1}_Price"] = ""
+                for i in range(5):
+                    if i < len(top_ads):
+                        row_usdt[f"Top{i+1}_Nick"] = top_ads[i].get("nick", "")
+                        row_usdt[f"Top{i+1}_Orders"] = top_ads[i].get("orders", "")
+                        row_usdt[f"Top{i+1}_Price"] = top_ads[i].get("price", "")
+                    else:
+                        row_usdt[f"Top{i+1}_Nick"] = ""
+                        row_usdt[f"Top{i+1}_Orders"] = ""
+                        row_usdt[f"Top{i+1}_Price"] = ""
 
                 diff_results_usdt.append(row_usdt)
                 logger.success(f"→ {row_usdt}")
@@ -156,8 +161,8 @@ def calculate_diff_and_save(
     # ✅ Save USDT (P2P)
     if diff_results_usdt:
         fieldnames_usdt = ["Date", "Brand", "Crypto", "Currency", "BO Market Price", "Binance Rate", "Exchange Rate", "Exchange Rate Sign"]
-        # for i in range(1, 6):
-        #     fieldnames_usdt += [f"Top{i}_Nick", f"Top{i}_Orders", f"Top{i}_Price"]
+        for i in range(1, 6):
+            fieldnames_usdt += [f"Top{i}_Nick", f"Top{i}_Orders", f"Top{i}_Price"]
 
         ws_usdt = get_or_create_tab(sh, "USDT_CONVERSION", fieldnames_usdt)
         rows = [list(row.values()) for row in diff_results_usdt]
