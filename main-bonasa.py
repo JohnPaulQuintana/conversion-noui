@@ -30,9 +30,12 @@ async def main():
     bonasa_service = BonasaService()
     auth_status = bonasa_service.authenticate(logger)
     if auth_status:
-        rows = read_and_calculate_bonasa_sheet_tab(logger, datetime.now())
-        print(rows)
-        save_effective_conversion(logger, rows)
+        rows = read_and_calculate_bonasa_sheet_tab(logger)
+        if rows:
+            print(rows)
+            save_effective_conversion(logger, rows)
+        else:
+            logger.warning("⚠️ No rows to process")
     else:
         logger.error()
     

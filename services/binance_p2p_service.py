@@ -23,7 +23,7 @@ class BinanceP2PService:
             "filterType": "all",
             "periods": [],
             "additionalKycVerifyFilter": 0,
-            "publisherType": "",
+            "publisherType": "merchant",
             "payTypes": [],
             "classifies": ["mass", "profession", "fiat_trade"],
             "tradedWith": False,
@@ -44,7 +44,12 @@ class BinanceP2PService:
                     adv = entry.get("adv", {})
                     advertiser = entry.get("advertiser", {})
                     trade_methods = entry.get("tradeMethods", [])
+                    featured_ad = entry.get("privilegeDesc", None)
                     trade_method_names = [method.get("tradeMethodName") for method in trade_methods]
+
+                     # Accept only ads with privilegeDesc == None or ""
+                    if featured_ad not in (None, ""):
+                        continue
 
                     # Skip if Bank Transfer is one of the trade methods
                     if "Bank Transfer" in trade_method_names:
