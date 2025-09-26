@@ -71,8 +71,9 @@ class BinanceP2PService:
 
                         if featured_ad not in (None, ""):
                             continue
-                        if "Bank Transfer" in trade_method_names:
-                            continue
+
+                        # if "Bank Transfer" in trade_method_names:
+                        #     continue
 
                         all_ads.append({
                             "price": float(adv.get("price")),

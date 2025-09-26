@@ -47,20 +47,20 @@ class BonasaService:
             try:
                 data = resp.json()
             except ValueError:
-                logger.error("❌ Response is not JSON")
+                logger.error("Response is not JSON")
                 return False
 
             # Check for embedded error message
             if isinstance(data, dict) and "ErrorMsg" in data and data["ErrorMsg"]:
-                logger.error(f"❌ Authentication failed: {data['ErrorMsg']}")
+                logger.error(f"Authentication failed: {data['ErrorMsg']}")
                 return False
 
             # If no error, assume success
-            logger.success("✅ Authentication successful")
+            logger.success("Authentication successful")
             return True
 
         except Exception as e:
-            logger.error(f"❌ Error during authentication: {e}")
+            logger.error(f"Error during authentication: {e}")
             traceback.print_exc()
             return False
 

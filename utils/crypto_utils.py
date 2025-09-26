@@ -73,8 +73,8 @@ def calculate_diff_and_save(
     if not isinstance(converted_currency_value, dict):
         converted_currency_value = dict(converted_currency_value)
 
-    # 🔍 Fetch BONASA row once (so we don't call the API repeatedly)
-    # ✅ Fix localtime parsing: handle both datetime object and string with time
+    # Fetch BONASA row once (so we don't call the API repeatedly)
+    # Fix localtime parsing: handle both datetime object and string with time
     if hasattr(localtime, "date"):  
         today_date = localtime.date()
     else:
@@ -210,7 +210,7 @@ def calculate_diff_and_save(
             diff_results_local.append(row)
             logger.success(f"→ {row}")
 
-    # ✅ Save LocalDiff (BTC/ETH)
+    # Save LocalDiff (BTC/ETH)
     if diff_results_local:
         fieldnames_local = [
             "Date",
@@ -228,7 +228,7 @@ def calculate_diff_and_save(
         ws_local.append_rows(rows, value_input_option="USER_ENTERED")
         logger.success("→ Differences appended to Google Sheet: LocalDiff")
 
-    # ✅ Save USDT (P2P)
+    # Save USDT (P2P)
     if diff_results_usdt:
         fieldnames_usdt = ["Date", "Brand", "Crypto", "Currency", "BO Market Price", "Binance Rate", "Exchange Rate", "Exchange Rate Sign"]
         for i in range(1, 6):
