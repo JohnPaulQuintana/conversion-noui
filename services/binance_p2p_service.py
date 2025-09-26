@@ -1,91 +1,240 @@
-import requests
+import json
 import traceback
 from utils.env_loader import get_env
+from datetime import datetime
+import asyncio
+import nest_asyncio
+from playwright.async_api import async_playwright
 
+nest_asyncio.apply()  # <-- allow nested event loops
 
 class BinanceP2PService:
     def __init__(self):
-        self.base_url = get_env(
-            "P2P_URL", "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
-        )
-        self.session = requests.Session()
+        self.base_url = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
 
-    def _build_payload(self, fiat: str, page: int) -> dict:
-        return {
-            "fiat": fiat,
-            "page": page,
-            "rows": 10,
-            "tradeType": "SELL",
-            "asset": "USDT",
-            "countries": [],
-            "proMerchantAds": False,
-            "shieldMerchantAds": False,
-            "filterType": "all",
-            "periods": [],
-            "additionalKycVerifyFilter": 0,
-            "publisherType": "merchant",
-            "payTypes": [],
-            "classifies": ["mass", "profession", "fiat_trade"],
-            "tradedWith": False,
-            "followed": False,
-        }
+    async def _fetch_all_pages_async(self, fiat: str, max_pages: int = 3):
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            context = await browser.new_context()
+            page = await context.new_page()
 
-    def fetch_top5_completed_order_rates(self, fiat: str) -> dict:
-        all_ads = []
- 
-        try:
-            for page in range(1, 4):  # first 3 pages
-                payload = self._build_payload(fiat, page)
-                resp = self.session.post(self.base_url, json=payload, timeout=10)
-                resp.raise_for_status()
-                data = resp.json().get("data", [])
+            captured_request = {}
 
-                for entry in data:
-                    adv = entry.get("adv", {})
-                    advertiser = entry.get("advertiser", {})
-                    trade_methods = entry.get("tradeMethods", [])
-                    featured_ad = entry.get("privilegeDesc", None)
-                    trade_method_names = [method.get("tradeMethodName") for method in trade_methods]
+            async def handle_request(request):
+                if "bapi/c2c/v2/friendly/c2c/adv/search" in request.url and request.method == "POST":
+                    if not captured_request:
+                        captured_request["url"] = request.url
+                        captured_request["headers"] = dict(request.headers)
+                        try:
+                            captured_request["post_data"] = request.post_data_json
+                        except:
+                            captured_request["post_data"] = json.loads(request.post_data or "{}")
 
-                     # Accept only ads with privilegeDesc == None or ""
-                    if featured_ad not in (None, ""):
-                        continue
+            page.on("request", handle_request)
+            await page.goto(f"https://p2p.binance.com/en/trade/sell/USDT?fiat={fiat}&payment=all-payments")
+            await page.wait_for_load_state("networkidle")
 
-                    # Skip if Bank Transfer is one of the trade methods
-                    if "Bank Transfer" in trade_method_names:
-                        continue
+            if not captured_request:
+                raise RuntimeError("Could not capture the search request.")
 
-                    all_ads.append({
-                        "price": float(adv.get("price")),
-                        "asset": adv.get("asset"),
-                        "fiat": payload["fiat"],
-                        "minAmount": adv.get("minSingleTransAmount"),
-                        "maxAmount": adv.get("dynamicMaxSingleTransAmount"),
-                        "available": adv.get("surplusAmount"),
-                        "tradeType": payload["tradeType"],
-                        "nick": advertiser.get("nickName"),
-                        "completionRate": advertiser.get("monthFinishRate"),
-                        "orders": advertiser.get("monthOrderCount", 0),
-                        "tradeMethods": trade_method_names,
-                    })
+            all_pages_raw = []
+            for page_number in range(1, max_pages + 1):
+                captured_request["post_data"]["page"] = page_number
+                response = await context.request.post(
+                    captured_request["url"],
+                    data=json.dumps(captured_request["post_data"]),
+                    headers=captured_request["headers"]
+                )
+                all_pages_raw.append(await response.json())
 
-            # Sort by highest orders
-            top_ads = sorted(all_ads, key=lambda x: x["orders"], reverse=True)[:5]
+            await browser.close()
+            return all_pages_raw
 
-            if not top_ads:
-                return {"status": "error", "message": "No ads found"}
+    def fetch_top5_completed_order_rates(self, fiat: str, max_retries: int = 3) -> dict:
+        """Sync wrapper for async Playwright fetch with retry logic and raw JSON save."""
+        attempt = 0
+        while attempt < max_retries:
+            try:
+                # Safe sync call even if already inside an event loop
+                loop = asyncio.get_event_loop()
+                all_pages_raw = loop.run_until_complete(self._fetch_all_pages_async(fiat, max_pages=3))
 
-            avg_rate = sum(ad["price"] for ad in top_ads) / len(top_ads)
+                all_ads = []
+                for page_data in all_pages_raw:
+                    data = page_data.get("data", [])
+                    for entry in data:
+                        adv = entry.get("adv", {})
+                        advertiser = entry.get("advertiser", {})
+                        trade_methods = adv.get("tradeMethods", [])
+                        featured_ad = entry.get("privilegeDesc", None)
+                        trade_method_names = [method.get("tradeMethodName") for method in trade_methods]
 
-            return {
-                "status": "success",
-                "fiat": fiat,
-                "asset": "USDT",
-                "binance_rate": avg_rate,
-                "sign": "Positive" if avg_rate >= 0 else "Negative",
-                "top_ads": top_ads,
-            }
+                        if featured_ad not in (None, ""):
+                            continue
+                        if "Bank Transfer" in trade_method_names:
+                            continue
 
-        except Exception:
-            return {"status": "error", "message": traceback.format_exc()}
+                        all_ads.append({
+                            "price": float(adv.get("price")),
+                            "asset": adv.get("asset"),
+                            "fiat": fiat,
+                            "minAmount": adv.get("minSingleTransAmount"),
+                            "maxAmount": adv.get("dynamicMaxSingleTransAmount"),
+                            "available": adv.get("surplusAmount"),
+                            "tradeType": "SELL",
+                            "nick": advertiser.get("nickName"),
+                            "completionRate": advertiser.get("monthFinishRate"),
+                            "orders": advertiser.get("monthOrderCount", 0),
+                            "tradeMethods": trade_method_names,
+                        })
 
+                # Save all raw pages (commented, you can uncomment if needed)
+                # timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                # with open(f"binance_{fiat}_pages_{timestamp}.json", "w", encoding="utf-8") as f:
+                #     json.dump({"pages": all_pages_raw}, f, indent=4, ensure_ascii=False)
+
+                top_ads = sorted(all_ads, key=lambda x: x["orders"], reverse=True)[:5]
+
+                # Retry if top_ads is empty
+                # if not top_ads:
+                #     attempt += 1
+                #     wait_time = 2 ** (attempt - 1)  # exponential backoff: 1s, 2s, 4s
+                #     print(f"No top ads found, retrying in {wait_time}s (attempt {attempt}/{max_retries})...")
+                #     import time; time.sleep(wait_time)
+                #     continue
+
+                avg_rate = sum(ad["price"] for ad in top_ads) / len(top_ads)
+                return {
+                    "status": "success",
+                    "fiat": fiat,
+                    "asset": "USDT",
+                    "binance_rate": avg_rate,
+                    "sign": "Positive" if avg_rate >= 0 else "Negative",
+                    "top_ads": top_ads,
+                }
+
+            except Exception:
+                attempt += 1
+                wait_time = 2 ** (attempt - 1)
+                print(f"Attempt {attempt} failed, retrying in {wait_time}s...")
+                import time; time.sleep(wait_time)
+                if attempt >= max_retries:
+                    # Return minimal info without breaking automation
+                    return {
+                        "status": "error",
+                        "fiat": fiat,
+                        "asset": "USDT",
+                        "binance_rate": None,
+                        "sign": None,
+                        "top_ads": [],
+                        "message": f"Failed after {attempt} attempts:\n{traceback.format_exc()}",
+                    }
+
+
+
+# class BinanceP2PService:
+    # def __init__(self):
+    #     self.base_url = get_env(
+    #         "P2P_URL", "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
+    #     )
+    #     self.session = requests.Session()
+
+    # def _build_payload(self, fiat: str, page: int) -> dict:
+    #     return {
+    #         "fiat": fiat,
+    #         "page": page,
+    #         "rows": 10,
+    #         "tradeType": "SELL",
+    #         "asset": "USDT",
+    #         "countries": [],
+    #         "proMerchantAds": False,
+    #         "shieldMerchantAds": False,
+    #         "filterType": "all",
+    #         "periods": [],
+    #         "additionalKycVerifyFilter": 0,
+    #         "publisherType": "merchant",
+    #         "payTypes": [],
+    #         "classifies": ["mass", "profession", "fiat_trade"],
+    #         "tradedWith": False,
+    #         "followed": False,
+    #     }
+
+    # def fetch_top5_completed_order_rates(self, fiat: str) -> dict:
+    #     all_ads = []
+    #     all_pages_raw = []  # <-- store full raw responses here
+
+    #     try:
+    #         for page in range(1, 4):  # first 3 pages
+    #             payload = self._build_payload(fiat, page)
+    #             print("---------------------------------------------")
+    #             print(payload)
+    #             print("---------------------------------------------")
+    #             resp = self.session.post(self.base_url, json=payload, timeout=10)
+    #             resp.raise_for_status()
+
+    #             page_data = resp.json()
+    #             all_pages_raw.append(page_data)  # store full raw response
+
+    #             data = page_data.get("data", [])
+
+    #             for entry in data:
+    #                 adv = entry.get("adv", {})
+    #                 advertiser = entry.get("advertiser", {})
+    #                 trade_methods = adv.get("tradeMethods", [])
+    #                 featured_ad = entry.get("privilegeDesc", None)
+    #                 trade_method_names = [
+    #                     method.get("tradeMethodName") for method in trade_methods
+    #                 ]
+
+    #                 # Accept only ads with privilegeDesc == None or ""
+    #                 if featured_ad not in (None, ""):
+    #                     continue
+
+    #                 # Skip if Bank Transfer is one of the trade methods
+                    
+    #                 if "Bank Transfer" in trade_method_names:
+    #                     print("----------------SKIPPING-----------------")
+    #                     print(trade_method_names)
+    #                     print(advertiser.get("nickName"))
+    #                     print("------------------------------------------------")
+    #                     continue
+
+    #                 all_ads.append(
+    #                     {
+    #                         "price": float(adv.get("price")),
+    #                         "asset": adv.get("asset"),
+    #                         "fiat": payload["fiat"],
+    #                         "minAmount": adv.get("minSingleTransAmount"),
+    #                         "maxAmount": adv.get("dynamicMaxSingleTransAmount"),
+    #                         "available": adv.get("surplusAmount"),
+    #                         "tradeType": payload["tradeType"],
+    #                         "nick": advertiser.get("nickName"),
+    #                         "completionRate": advertiser.get("monthFinishRate"),
+    #                         "orders": advertiser.get("monthOrderCount", 0),
+    #                         "tradeMethods": trade_method_names,
+    #                     }
+    #                 )
+
+    #         # ✅ Save all raw pages to a single JSON file
+    #         with open(f"binance_{fiat}_pages.json", "w", encoding="utf-8") as f:
+    #             json.dump({"pages": all_pages_raw}, f, indent=4, ensure_ascii=False)
+
+    #         # Sort by highest orders
+    #         top_ads = sorted(all_ads, key=lambda x: x["orders"], reverse=True)[:5]
+
+    #         if not top_ads:
+    #             return {"status": "error", "message": "No ads found"}
+
+    #         avg_rate = sum(ad["price"] for ad in top_ads) / len(top_ads)
+
+    #         return {
+    #             "status": "success",
+    #             "fiat": fiat,
+    #             "asset": "USDT",
+    #             "binance_rate": avg_rate,
+    #             "sign": "Positive" if avg_rate >= 0 else "Negative",
+    #             "top_ads": top_ads,
+    #         }
+
+    #     except Exception:
+    #         return {"status": "error", "message": traceback.format_exc()}

@@ -105,6 +105,7 @@ def calculate_diff_and_save(
                 reused_currency = bo_entry["currency"].strip().upper()
                 reused_bo_value = bo_entry["marketPrice"]
                 xe_rate = xe_data.get("rates", {}).get(reused_currency, 1)
+                print("ITS BEING CALLED.....")
                 p2p_usdt_result = p2p_service.fetch_top5_completed_order_rates(
                     reused_currency
                 )
